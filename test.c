@@ -152,12 +152,12 @@ main(int argc, char *argv[])
 		printf("NOK");
 	printf(" (%d)\trun time: %f\n\n", score, timing);
 
-	printf("Test 14: Big movement, increase board X and Y (positive): input: SSSSSSSSEEEEEEEEEEE; expect: score 21\n");
+	printf("Test 14: Big movement, increase board X and Y (positive): input: SSSSSSSSEEEEEEEEEEE; expect: score 20\n");
 	t = clock();
 	score = move("SSSSSSSSEEEEEEEEEEE");
 	t = clock() - t;
 	timing = ((double) t) / CLOCKS_PER_SEC;
-	if (score == 21)
+	if (score == 20)
 		printf("OK");
 	else 
 		printf("NOK");
@@ -169,6 +169,17 @@ main(int argc, char *argv[])
 	t = clock() - t;
 	timing = ((double) t) / CLOCKS_PER_SEC;
 	if (score == 21)
+		printf("OK");
+	else 
+		printf("NOK");
+	printf(" (%d)\trun time: %f\n\n", score, timing);
+
+	printf("Test 16: Big movement, increase board X and Y (mixed): input: OOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEEEEEEEEEEEEEESSSSSSSSSSSSSS; expect: score 62\n");
+	t = clock();
+	score = move("OOOOOOONNNNNNNNNNNNNEEEEEEEEEEEEEEEEEEEEEEEEEEESSSSSSSSSSSSSS");
+	t = clock() - t;
+	timing = ((double) t) / CLOCKS_PER_SEC;
+	if (score == 62)
 		printf("OK");
 	else 
 		printf("NOK");

@@ -149,7 +149,7 @@ move_player(struct game *game, int x, int y)
 	game->player_x += x;
 	game->player_y += y;
 
-	/* set new board and adjust player position */
+	/* set new board and adjust player position, if needed */
 	if (game->player_x < 0 || game->player_x > game->board->size_x - 1) {
 		size_t new_size_x = game->board->size_x * 2;
 		int **new_arr_x = (int **) calloc(new_size_x, sizeof(int *));
@@ -173,7 +173,7 @@ move_player(struct game *game, int x, int y)
 
 			int i = game->board->size_x;
 			int j = 0;
-			for (; i < game->board->size_x; i++, j++)
+			for (; i < new_size_x; i++, j++)
 				new_arr_x[i] = game->board->arr[j];
 
 			free(game->board->arr);
@@ -219,7 +219,6 @@ move_player(struct game *game, int x, int y)
 				game->board->arr[i] = new_arr_y;
 			}
 
-			/* we translate the player position */
 			game->player_y = game->board->size_y - 1; 
 		} else {
 			for (int i = 0; i < game->board->size_x; i++) {
