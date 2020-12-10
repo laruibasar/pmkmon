@@ -1,6 +1,6 @@
 CC = cc
 PROG = pmkmon
-CFLAGS = -c -Wall -Werror -O3
+CFLAGS = -c -Wall -Werror -Og -g
 DEPS = utils.h
 OBJ = utils.o
 
@@ -9,6 +9,9 @@ all: app test
 
 .PHONY: app
 app: $(OBJ) $(PROG)
+
+.PHONY: test
+test:  test
 
 .PHONY: clean
 clean: clean-app clean-test
@@ -19,6 +22,7 @@ clean-app:
 
 clean-test:
 	@echo "Cleaning test *.o"
+	rm -f utils.o test.o
 
 utils.o: utils.c $(DEPS)
 	@echo "Compiling " $<
@@ -32,3 +36,10 @@ pmkmon.o: pmkmon.c $(DEPS)
 	@echo "Compiling " $<
 	$(CC) $(CFLAGS) -o $@ $<
 
+test: test.o $(OBJ)
+	@echo "Linking and create test executable " $<
+	$(CC) -o $@ $(OBJ) $<
+
+test.o: test.c $(DEPS)
+	@echo "Compiling " $<
+	$(CC) $(CFLAGS) -o $@ $<
