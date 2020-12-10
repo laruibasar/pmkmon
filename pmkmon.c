@@ -21,6 +21,8 @@ struct game {
 };
 
 void	usage(void);
+void	run(const char *);
+void	interactive(void);
 char*	parse_move(const char*);
 int	move(const char*);
 int	move_player(struct game*, int, int);
@@ -41,15 +43,7 @@ main(int argc, char *argv[])
 		usage();
 		return 0;
 	}
-
-	if (strcmp(argv[1], "-i") == 0) {
-		return 0;
-	}
-	
-	char *str = parse_move(argv[1]);
-	printf("\nMoves: %s\tScore: %d\n", str, move(str));
-
-	free(str);
+	run(argv[1]);
 	
 	return 0;
 }
@@ -61,14 +55,23 @@ void
 usage()
 {
 	printf("usage: \tpmkmon -h\n");
-	printf("\tpmkmon -i\n");
 	printf("\tpmkmon directions\n\n");
 	printf("\t-h: show this text\n");
-	printf("\t-i: enter interactive mode\n");
 	printf("\tdirections: N S E O\n");
 	printf("\texample: pmkmon NNES\n");
 }
 
+void
+run(const char *arg)
+{
+	char *str = parse_move(arg);
+	if (strlen(str) == 0) {
+		printf("\"%s\" doesn\'t have a valid movement. Exiting\n", arg);
+		exit(1);
+	}
+	printf("Moves: %s\tScore: %d\n", str, move(str));
+	free(str);
+}
 /*
  * Parse input string with movement to a valid string with movements and 
  * correct terminated.
@@ -139,6 +142,7 @@ move(const char *move)
 		printf("Out of memory\n");
 		exit(1);
 	}
+
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		if ((board.arr[i] = (int *)calloc(BOARD_SIZE, sizeof(int))) == NULL) {
 			printf("Out of memory\n");
@@ -204,6 +208,18 @@ move_player(struct game *game, int x, int y)
 		}
 
 		if (game->player_x < 0) {
+			for (int i = 0; i < game->board->size_x; i++) {
+				int *new_y = (int *) calloc(
+						game->board->size_y,
+						sizeof(int));
+				if (new_y == NULL) {
+					printf("Out of memory\n");
+					exit(1);
+				}
+
+				new_arr_x[i] = new_y;
+			}
+
 			int i = game->board->size_x;
 			int j = 0;
 			for (; i < game->board->size_x; i++, j++)
@@ -211,18 +227,7 @@ move_player(struct game *game, int x, int y)
 
 			free(game->board->arr);
 			game->board->arr = new_arr_x;
-
-			for (i = 0; i < game->board->size_x; i++) {
-				int *new_y = (int *) calloc(game->board->size_y,
-						sizeof(int));
-
-				if (new_y == NULL) {
-					printf("Out of memory\n");
-					exit(1);
-				}
-
-				game->board->arr[i] = new_y;
-			}
+			game->player_x = game->board->size_x - 1;
 		} else {
 			for (int i = 0; i < game->board->size_x; i++)
 				new_arr_x[i] = game->board->arr[i];
@@ -244,47 +249,45 @@ move_player(struct game *game, int x, int y)
 		game->board->size_x = new_size_x;
 	}
 
-	if (game->player_y < 0) {
+	if (game->player_y < 0 || game->player_y > game->board->size_y - 1) {
 		size_t new_size_y = game->board->size_y * 2;
 
-		for (int i = 0; i < game->board->size_x; i++) {
-			int *new_arr_y = (int *) calloc(new_size_y,
-					sizeof(int));
-			if (new_arr_y == NULL) {
-				printf("Out of memory\n");
-				exit(1);
+		if (game->player_y < 0) {
+			for (int i = 0; i < game->board->size_x; i++) {
+				int *new_arr_y = (int *) calloc(new_size_y,
+						sizeof(int));
+				if (new_arr_y == NULL) {
+					printf("Out of memory\n");
+					exit(1);
+				}
+
+				for (int j = new_size_y - 1; j > game->board->size_y - 1; j--)
+					new_arr_y[j] = game->board->arr[i][j];
+
+				free(game->board->arr[i]);
+				game->board->arr[i] = new_arr_y;
 			}
 
-			for (int j = new_size_y - 1; j > game->board->size_y - 1; j--)
-				new_arr_y[j] = game->board->arr[i][j];
+			/* we translate the player position */
+			game->player_y = game->board->size_y - 1; 
+		} else {
+			for (int i = 0; i < game->board->size_x; i++) {
+				int *new_arr_y = (int *) calloc(new_size_y,
+						sizeof(int));
+				if (new_arr_y == NULL) {
+					printf("Out of memory\n");
+					exit(1);
+				}
 
-			free(game->board->arr[i]);
-			game->board->arr[i] = new_arr_y;
-		}
+				for (int j = 0; j < game->board->size_y; j++)
+					new_arr_y[j] = game->board->arr[i][j];
 
-		/* we translate the player position */
-		game->player_y = game->board->size_y - 1; 
-		game->board->size_y = new_size_y;
-	}
-
-	if (game->player_y > game->board->size_y - 1) {
-		size_t new_size_y = game->board->size_y * 2;
-		
-		for (int i = 0; i < game->board->size_x; i++) {
-			int *new_arr_y = (int *) calloc(new_size_y,
-					sizeof(int));
-			if (new_arr_y == NULL) {
-				printf("Out of memory\n");
-				exit(1);
+				free(game->board->arr[i]);
+				game->board->arr[i] = new_arr_y;
 			}
-
-			for (int j = 0; j < game->board->size_y; j++)
-				new_arr_y[j] = game->board->arr[i][j];
-
-			free(game->board->arr[i]);
-			game->board->arr[i] = new_arr_y;
 		}
-		game->board->size_y = new_size_y;
+		game->board->size_y = new_size_y;		
+	
 	}
 
 	/* lets score */
