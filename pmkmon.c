@@ -196,9 +196,7 @@ move_player(struct game *game, int x, int y)
 
 	/* set new board and adjust player position */
 	if (game->player_x < 0 || game->player_x > game->board->size_x - 1) {
-		printf("Resize X: %zu\n", game->board->size_x);
 		size_t new_size_x = game->board->size_x * 2;
-		
 		int **new_arr_x = (int **) calloc(new_size_x, sizeof(int *));
 		if (new_arr_x == NULL) {
 			printf("Out of memory\n");
