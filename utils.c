@@ -150,6 +150,26 @@ move_player(struct game *game, int x, int y)
 	game->player_y += y;
 
 	/* set new board and adjust player position, if needed */
+	if (game->player_x < 0  
+	    || game->player_x > game->board->size_x - 1 
+	    || game->player_y < 0 
+	    || game->player_y > game->board->size_y - 1) 
+		resize_board(game);
+	
+
+	/* lets score */
+	if (game->board->arr[game->player_x][game->player_y] == 0) {
+		score++;
+		game->board->arr[game->player_x][game->player_y] = 1;
+	}
+ 
+	return score;
+}
+
+void
+resize_board(struct game *game)
+{
+	/* set new board and adjust player position, if needed */
 	if (game->player_x < 0 || game->player_x > game->board->size_x - 1) {
 		size_t new_size_x = game->board->size_x * 2;
 		int **new_arr_x = (int **) calloc(new_size_x, sizeof(int *));
@@ -237,15 +257,5 @@ move_player(struct game *game, int x, int y)
 			}
 		}
 		game->board->size_y = new_size_y;		
-	
 	}
-
-	/* lets score */
-	if (game->board->arr[game->player_x][game->player_y] == 0) {
-		score++;
-		game->board->arr[game->player_x][game->player_y] = 1;
-	}
- 
-	return score;
 }
-

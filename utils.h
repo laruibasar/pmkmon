@@ -24,6 +24,7 @@ void	interactive(void);
 char*	parse_move(const char*);
 int	move(const char*);
 int	move_player(struct game*, int, int);
+void	resize_board(struct game*);
 
 #define NORTH	-1
 #define SOUTH	 1
